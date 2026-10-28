@@ -1,10 +1,13 @@
 """Provider model-list metadata cache."""
 
+import logging
 from collections.abc import Iterable
 from dataclasses import replace
 
 from free_claude_code.application.model_metadata import ProviderModelInfo
 from free_claude_code.config.provider_catalog import SUPPORTED_PROVIDER_IDS
+
+logger = logging.getLogger(__name__)
 
 
 class ProviderModelCache:
@@ -13,8 +16,10 @@ class ProviderModelCache:
     def __init__(
         self,
         available_provider_ids: Iterable[str] = SUPPORTED_PROVIDER_IDS,
+        free_model_filter: set[str] | None = None,
     ) -> None:
         self._available_provider_ids = frozenset(available_provider_ids)
+        self._free_model_filter = free_model_filter
         self._model_infos_by_provider: dict[str, dict[str, ProviderModelInfo]] = {}
 
     def cache_model_infos(
@@ -26,11 +31,28 @@ class ProviderModelCache:
         clean_infos = {
             info.model_id: info for info in model_infos if info.model_id.strip()
         }
+
+        # Apply free model filter if provided
+        if self._free_model_filter is not None:
+            original_count = len(clean_infos)
+            clean_infos = {
+                model_id: info
+                for model_id, info in clean_infos.items()
+                if f"{provider_id}/{model_id}" in self._free_model_filter
+            }
+            filtered_count = original_count - len(clean_infos)
+            if filtered_count > 0:
+                logger.debug(
+                    f"Filtered out {filtered_count} non-free models for provider {provider_id}"
+                )
+
         self._model_infos_by_provider[provider_id] = clean_infos
 
     def copy(self, available_provider_ids: Iterable[str]) -> ProviderModelCache:
         """Seed a generation without sharing mutable dictionaries with its predecessor."""
-        result = ProviderModelCache(available_provider_ids)
+        result = ProviderModelCache(
+            available_provider_ids, free_model_filter=self._free_model_filter
+        )
         for provider_id, infos in self._model_infos_by_provider.items():
             result.cache_model_infos(provider_id, infos.values())
         return result

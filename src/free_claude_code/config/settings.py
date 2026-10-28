@@ -426,6 +426,15 @@ class Settings(BaseModel):
         validation_alias="MODEL_FALLBACKS",
     )
 
+    # ==================== Model Catalog Filtering ====================
+    free_catalog_path: OptionalNonEmptyString = Field(
+        default=None,
+        validation_alias="FREE_CATALOG_PATH",
+        description="Path to the JSON catalog of free models to restrict FCC to. "
+        "Filtering is opt-in: only active when this path is explicitly set "
+        "(e.g. via FREE_CATALOG_PATH env var).",
+    )
+
     # ==================== Per-Provider Proxy ====================
     openai_proxy: OptionalNonEmptyString = Field(
         default=None, validation_alias="OPENAI_PROXY"

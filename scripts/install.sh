@@ -150,7 +150,7 @@ print_installer_retry() {
     else
         installer_ref=main
         [ -z "$fcc_install_version" ] || installer_ref="v$fcc_install_version"
-        printf "curl -fsSL 'https://raw.githubusercontent.com/Alishahryar1/free-claude-code/%s/scripts/install.sh' | " "$installer_ref"
+        printf "curl -fsSL 'https://raw.githubusercontent.com/CondensedChaos/free-claude-code/%s/scripts/install.sh' | " "$installer_ref"
         if [ -n "$fcc_install_version" ]; then
             printf 'FCC_INSTALL_VERSION='
             shell_quote "$fcc_install_version"
@@ -1678,7 +1678,7 @@ show_installer_next_steps() {
 }
 
 dispatch_release() {
-    release_base="https://github.com/Alishahryar1/free-claude-code/releases"
+    release_base="https://github.com/CondensedChaos/free-claude-code/releases"
     if [ -z "$fcc_install_version" ]; then
         selected_url=$(curl -fsSL --max-time 10 --max-redirs 5 -o /dev/null -w '%{url_effective}' "$release_base/latest") ||
             fail "Could not resolve the latest completed FCC release."
@@ -1688,7 +1688,7 @@ dispatch_release() {
         esac
         validate_args
     fi
-    if ! selected_installer=$(curl -fsSL --max-time 10 --max-redirs 5 "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/v$fcc_install_version/scripts/install.sh") ||
+    if ! selected_installer=$(curl -fsSL --max-time 10 --max-redirs 5 "https://raw.githubusercontent.com/CondensedChaos/free-claude-code/v$fcc_install_version/scripts/install.sh") ||
         [ -z "$selected_installer" ] || ! sh -n -c "$selected_installer"; then
         print_installer_retry >&2
         fail "Could not load the installer for FCC $fcc_install_version."
@@ -1735,7 +1735,7 @@ parse_toolchain_requirements() {
 }
 
 load_toolchain() {
-    metadata_url="https://raw.githubusercontent.com/Alishahryar1/free-claude-code/v$fcc_install_version/pyproject.toml"
+    metadata_url="https://raw.githubusercontent.com/CondensedChaos/free-claude-code/v$fcc_install_version/pyproject.toml"
     if ! toolchain_text=$(curl -fsSL --max-time 10 --max-redirs 5 "$metadata_url"); then
         print_installer_retry >&2
         fail "Could not fetch toolchain requirements for FCC $fcc_install_version."

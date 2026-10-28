@@ -63,6 +63,7 @@ RUNTIME_FIELDS = (
     "messaging_rate_limit",
     "messaging_rate_window",
     "max_message_log_entries_per_chat",
+    "free_catalog_path",
 )
 ROUTING_FIELDS = (
     "model",

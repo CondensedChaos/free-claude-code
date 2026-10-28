@@ -15,7 +15,9 @@ from free_claude_code.application.model_metadata import (
 )
 from free_claude_code.application.ports import ModelCatalogPort, ModelCatalogSnapshot
 from free_claude_code.application.readiness import InitializationWait
+from free_claude_code.config.free_catalog import load_free_model_slugs
 from free_claude_code.config.model_refs import split_provider_model_ref
+from free_claude_code.config.paths import free_codex_model_catalog_path
 from free_claude_code.config.provider_catalog import PROVIDER_CATALOG
 from free_claude_code.config.settings import Settings
 from free_claude_code.core.async_tasks import run_sync_owned
@@ -189,6 +191,13 @@ class ProviderRuntimeManager:
         self._catalog_revision = 0
         self._closing = False
         self._closed = False
+        catalog_path = settings.free_catalog_path
+        if catalog_path is None:
+            default_path = free_codex_model_catalog_path()
+            if default_path.is_file():
+                catalog_path = str(default_path)
+        free_model_slugs = load_free_model_slugs(catalog_path)
+        free_model_filter = free_model_slugs if free_model_slugs else None
         self._current = _ProviderGeneration(
             generation_id=1,
             settings=settings,
@@ -196,7 +205,8 @@ class ProviderRuntimeManager:
             cache=ProviderModelCache(
                 model_cache_provider_ids_for_settings(
                     settings, connected_provider_ids()
-                )
+                ),
+                free_model_filter=free_model_filter,
             ),
         )
         self._trace_published(self._current, previous=None, reason="startup")

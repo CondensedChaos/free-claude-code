@@ -11,6 +11,7 @@ FCC_LOGS_DIRNAME = "logs"
 SERVER_LOG_FILENAME = "server.log"
 SERVER_STARTUP_LOG_FILENAME = "startup.log"
 CODEX_MODEL_CATALOG_FILENAME = "codex-model-catalog.json"
+FREE_CATALOG_FILENAME = "codex-model-catalog-free.json"
 AUTH_DIRNAME = "auth"
 OPENAI_AUTH_FILENAME = "openai.json"
 OPENAI_AUTH_LOCK_FILENAME = "openai.lock"
@@ -108,6 +109,12 @@ def codex_model_catalog_path() -> Path:
     """Return the generated Codex model catalog path."""
 
     return config_dir_path() / CODEX_MODEL_CATALOG_FILENAME
+
+
+def free_codex_model_catalog_path() -> Path:
+    """Return the default path for the free model catalog."""
+
+    return config_dir_path() / FREE_CATALOG_FILENAME
 
 
 def claude_desktop_disconnect_path() -> Path:
